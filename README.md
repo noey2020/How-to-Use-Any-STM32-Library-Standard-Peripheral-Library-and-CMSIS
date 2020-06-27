@@ -278,9 +278,9 @@ Note the earlier defines.
 
 #define AHBPERIPH_BASE   (PERIPH_BASE + 0x20000)   /* line 711 */
 
-Now we have a pointer and we proceed with pointer methods to do and complete the register
-programming.
-  
+Now we have our struct pointer aliased GPIOB and we proceed with pointer methods to
+finish off the register programming.
+    
 As an aside, you write to use them in your application code. Try to follow and 
 leverage the example/sample codes.
 
