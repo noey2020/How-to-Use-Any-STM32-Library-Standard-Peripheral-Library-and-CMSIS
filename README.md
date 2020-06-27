@@ -52,37 +52,58 @@ defines and anything that uses are instantly updated and doesn't need to be re-w
 
 Sample defines:
 
-/** @defgroup GPIO_pins_define 
-  * @{
-  */
 #define GPIO_Pin_0        ((uint16_t)0x0001)  /*!< Pin 0 selected */
+
 #define GPIO_Pin_1        ((uint16_t)0x0002)  /*!< Pin 1 selected */
+
 #define GPIO_Pin_2        ((uint16_t)0x0004)  /*!< Pin 2 selected */
+
 #define GPIO_Pin_3        ((uint16_t)0x0008)  /*!< Pin 3 selected */
+
 #define GPIO_Pin_4        ((uint16_t)0x0010)  /*!< Pin 4 selected */
+
 #define GPIO_Pin_5        ((uint16_t)0x0020)  /*!< Pin 5 selected */
+
 #define GPIO_Pin_6        ((uint16_t)0x0040)  /*!< Pin 6 selected */
+
 #define GPIO_Pin_7        ((uint16_t)0x0080)  /*!< Pin 7 selected */
+
 #define GPIO_Pin_8        ((uint16_t)0x0100)  /*!< Pin 8 selected */
+
 #define GPIO_Pin_9        ((uint16_t)0x0200)  /*!< Pin 9 selected */
+
 #define GPIO_Pin_10       ((uint16_t)0x0400)  /*!< Pin 10 selected */
+
 #define GPIO_Pin_11       ((uint16_t)0x0800)  /*!< Pin 11 selected */
+
 #define GPIO_Pin_12       ((uint16_t)0x1000)  /*!< Pin 12 selected */
+
 #define GPIO_Pin_13       ((uint16_t)0x2000)  /*!< Pin 13 selected */
+
 #define GPIO_Pin_14       ((uint16_t)0x4000)  /*!< Pin 14 selected */
+
 #define GPIO_Pin_15       ((uint16_t)0x8000)  /*!< Pin 15 selected */
+
 #define GPIO_Pin_All      ((uint16_t)0xFFFF)  /*!< All pins selected */
 
 I have seen custom-written defines like these:
 
 #define NC_GPIO_PIN_0     ((uint16_t)0x0001)  /*!< Pin 0 selected */
+
 #define NC_GPIO_PIN_1     ((uint16_t)0x0002)  /*!< Pin 1 selected */
+
 #define NC_GPIO_PIN_2     ((uint16_t)0x0004)  /*!< Pin 2 selected */
+
 ...
+
 #define GPIO_PINSOURCE0   ((uint8_t)0x00)
+
 #define GPIO_PINSOURCE1   ((uint8_t)0x01)
+
 #define GPIO_PINSOURCE2   ((uint8_t)0x02)
+
 ...
+
 ...
 
 The short story is you can write it any way you like as long as it suits and accomplishes
@@ -92,20 +113,31 @@ For the functions to use, you have to digest them in the header and c files like
 
 void GPIO_Init(GPIO_TypeDef* GPIOx, GPIO_InitTypeDef* GPIO_InitStruct)
 {
+
   uint32_t pinpos = 0x00, pos = 0x00 , currentpin = 0x00;
+  
   uint32_t tmpreg = 0x00;
+  
   ...
   
 Inside void GPIO_DeInit(GPIO_TypeDef* GPIOx), 
+
   if(GPIOx == GPIOA)
   {
+  
     RCC_AHBPeriphResetCmd(RCC_AHBPeriph_GPIOA, ENABLE);
+    
     RCC_AHBPeriphResetCmd(RCC_AHBPeriph_GPIOA, DISABLE);  
+    
   }
+  
   else if(GPIOx == GPIOB)
   {
+  
     RCC_AHBPeriphResetCmd(RCC_AHBPeriph_GPIOB, ENABLE);
+    
     RCC_AHBPeriphResetCmd(RCC_AHBPeriph_GPIOB, DISABLE);
+    
     ...
     
 If you don't use any libraries, you will use this kind of code, as a trivial example, to
@@ -113,10 +145,15 @@ enable the GPIO port B clock. From the reference manual RM0038 and in the STM32L
 architecture schematic pages 42-46, the GPIO port registers are connected to the AHB bus.
 
 /* Enable GPIO port B clock in 3 ways */
+
 RCC->AHBENR |= 0x00000002;	      /* Set bit 1 to enable. pages 153-154. Method 1. */
+
 RCC->AHBENR |= 1 << 2;		      /* 1UL << 0x2. Method 2 */
+
 RCC->AHBENR |= RCC_AHBENR_GPIOBEN;    /* Using 	line 2803 of stm32l1xx.h so don't forget
+
 					 to include it. Method 3. See below to illustrate. */
+					 
 #define  RCC_AHBENR_GPIOBEN  ((uint32_t)0x00000002)  /* !< GPIO port B clock enable. */
 
 The safest is to include everything but the downside is it bloats the code, unnecessarily.
@@ -143,19 +180,33 @@ starting on line 411 of stm32l1xx.h.
 
 typedef struct
 {
+
   __IO uint32_t MODER;
+  
   __IO uint16_t OTYPER;
+  
   uint16_t RESERVED0;
+  
   __IO uint32_t OSPEEDR;
+  
   __IO uint32_t PUPDR;
+  
   __IO uint16_t IDR;
+  
   uint16_t RESERVED1;
+  
   __IO uint16_t ODR;
+  
   uint16_t RESERVED2;
+  
   __IO uint16_t BSRRL; /* BSRR register is split to 2 * 16-bit fields BSRRL */
+  
   __IO uint16_t BSRRH; /* BSRR register is split to 2 * 16-bit fields BSRRH */
+  
   __IO uint32_t LCKR;
+  
   __IO uint32_t AFR[2];
+  
 } GPIO_TypeDef;
 
 We define and typedef struct to create an alias for our new type GPIO_TypeDef. It is not
@@ -163,11 +214,13 @@ a built-in type so we typedef. We next declare a struct pointer, cast it to memo
 address for GPIOB.
 
 #define GPIOB            ((GPIO_TypeDef *) GPIOB_BASE)  /* line 815 */
+
 #define GPIOB_BASE       (AHBPERIPH_BASE + 0x0400)      /* line 743 */
 
 Note the earlier defines.
 
 #define PERIPH_BASE      ((uint32_t)0x40000000)    /*!< Peripheral base address in the alias region. line 703 */
+
 #define AHBPERIPH_BASE   (PERIPH_BASE + 0x20000)   /* line 711 */
 
 Now we have a pointer and we proceed with pointer methods to do and complete the register
