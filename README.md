@@ -148,7 +148,7 @@ architecture schematic pages 42-46, the GPIO port registers are connected to the
 
 RCC->AHBENR |= 0x00000002;	      /* Set bit 1 to enable. pages 153-154. Method 1. */
 
-RCC->AHBENR |= 1 << 2;		      /* 1UL << 0x2. Method 2 */
+RCC->AHBENR |= 1 << 1;		      /* 1UL << 0x2. Method 2 */
 
 RCC->AHBENR |= RCC_AHBENR_GPIOBEN;    /* Using 	line 2803 of stm32l1xx.h so don't forget
 
