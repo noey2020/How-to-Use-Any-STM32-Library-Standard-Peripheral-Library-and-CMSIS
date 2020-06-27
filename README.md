@@ -15,7 +15,7 @@ through understanding the hardware aspects, we develop data structures to effect
 navigate & program or do regiser programming.
 
 To hardware engineers, they would understand multiplexer, basic logic gates like AND, OR,
-EOR, Inverter and the like. To enable/disable a circuit mapped to a register, you set
+XOR, Inverter and the like. To enable/disable a circuit mapped to a register, you set
 or clear a bit in the register entry. To set choose a single circuit from multiple 
 inputs you multiplex hence you write a hex number say 0x3 to those bits. By the way,
 explained in other tutorials, peripheral registers are memory-mapped to bit-banded areas
@@ -161,6 +161,10 @@ RCC->AHBENR |= RCC_AHBENR_GPIOBEN;    /* Using 	line 2803 of stm32l1xx.h so don'
 If we need to disable the clock, we clear, instead of set, bit 1 to 0x0. In code, it is:
 
 RCC->AHBENR |= 0x0;                   /* Clear bit 1 to disable */
+
+Correspondingly, to enable GPIOA clock, we set bit 0 and in code:
+
+RCC->AHBENR |= 1UL << 0;	      /* 1UL << 0. Set bit 0. */
 
 The safest is to include everything but the downside is it bloats the code, unnecessarily.
 		
