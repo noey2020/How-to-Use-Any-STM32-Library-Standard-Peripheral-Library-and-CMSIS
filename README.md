@@ -158,6 +158,12 @@ RCC->AHBENR |= RCC_AHBENR_GPIOBEN;    /* Using 	line 2803 of stm32l1xx.h so don'
 					 
 #define  RCC_AHBENR_GPIOBEN  ((uint32_t)0x00000002)  /*!< GPIO port B clock enable. */
 
+The safest is to include everything but the downside is it bloats the code, unnecessarily.
+
+Fortunately, it is only a single line of code so it is rather easy and straighforward. 
+But for other peripherals, things become complex & worrisome. We need to do what we have
+to do.
+
 If we need to disable the clock, we clear, instead of set, bit 1 to 0x0. In code, it is:
 
 RCC->AHBENR |= 0x0;                   /* Clear bit 1 to disable */
@@ -166,14 +172,53 @@ Correspondingly, to enable GPIOA clock, we set bit 0 and in code:
 
 RCC->AHBENR |= 1UL << 0;	      /* 1UL << 0. Set bit 0. */
 
-The safest is to include everything but the downside is it bloats the code, unnecessarily.
-		
-Fortunately, it is only a single line of code so it is rather easy and straighforward. 
-But for more complex peripherals, I have found it more taxing and takes a long time
-going back and forth the reference & programming manuals plus the datasheet and testing
-out if the bit assignments are working. You can really imagine the meticulous code effort
-doing this methodology for the rather more complicated peripheral registers. Hence, the
-rationale for libraries. Saving days or weeks of effort and time.
+And to explain things more concretely, here are assembly code snippets to enable GPIOB
+clock and set pin 6 as gp output:
+
+PERIPH_BASE     EQU   (0x40000000) ; Peripheral base address in the alias region 
+
+AHBPERIPH_BASE  EQU   (PERIPH_BASE + 0x20000)
+
+GPIOB_BASE      EQU   (AHBPERIPH_BASE + 0x0400)
+
+GPIO_MODER	EQU   0x00
+
+RCC_BASE        EQU   (AHBPERIPH_BASE + 0x3800)
+
+RCC_AHBENR      EQU   0x1C
+
+...
+
+	; Enable clock to GPIO port B
+	
+	LDR r7, =RCC_BASE		; Load address of reset & clock control (RCC)
+	
+	LDR r1, [r7, #RCC_AHBENR]	; r1 = RCC->AHBENR
+	
+	ORR r1, r1, #0x00000002		; Set bit 2 of AHBENR
+	
+	STR r1, [r7, #RCC_AHBENR]	; GPIO port B clock enable
+	
+
+	; Set pin 6 IO mode as general-purpose output
+	
+	LDR r7, =GPIOB_BASE		; Load GPIO port B base address
+	
+	LDR r1, [r7, #GPIO_MODER]	; r1 = GPIOB->MODER
+	
+	BIC r1, r1, #(0x03 << 12)	; Direction mask pin 6. clear bits 12 & 13
+	
+	ORR r1, r1, #(0x1 << 12)	; Set mode as digital output (0b01)
+	
+	STR r1, [r7, #GPIO_MODER]	; Save 
+	...
+	
+
+In my experience, I found it more taxing and takes a long time going back and forth the
+reference & programming manuals plus the datasheet and testing out if the bit assignments
+are working. You can really imagine the meticulous code effort doing this methodology for
+the more complicated peripheral registers. Hence, the rationale for libraries. Saving
+days or weeks of effort and time.
 
 You must love indexed addressing in assembly and pointers in C to appreciate data 
 structures used in the libraries. Pointers are just addresses and they are made to point
