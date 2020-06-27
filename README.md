@@ -41,6 +41,7 @@ include the appropriate header and c files. I'm using the STM32L1 family so I'll
 include:
 
 stm32l1xx_gpio.h
+
 stm32l1xx_gpio.c
 
 If we look inside these files, we read the comments, defines, function prototypes, and the
