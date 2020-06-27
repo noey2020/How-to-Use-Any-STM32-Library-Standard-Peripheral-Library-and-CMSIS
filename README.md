@@ -146,15 +146,21 @@ architecture schematic pages 42-46, the GPIO port registers are connected to the
 
 /* Enable GPIO port B clock in 3 ways */
 
-RCC->AHBENR |= 0x00000002;	      /* Set bit 1 to enable. pages 153-154. Method 1. */
+RCC->AHBENR |= 0x00000002;	      /* Set bit 1 to enable. pages 153-154. We bitwise
 
-RCC->AHBENR |= 1 << 1;		      /* 1UL << 0x2. Method 2 */
+					 OR RCC->AHBENR register with 0b0010. Method 1. */
+					 
+RCC->AHBENR |= 1UL << 1;	      /* 1UL << 1. Set bit 1. Method 2 */
 
 RCC->AHBENR |= RCC_AHBENR_GPIOBEN;    /* Using 	line 2803 of stm32l1xx.h so don't forget
 
 					 to include it. Method 3. See below to illustrate. */
 					 
-#define  RCC_AHBENR_GPIOBEN  ((uint32_t)0x00000002)  /* !< GPIO port B clock enable. */
+#define  RCC_AHBENR_GPIOBEN  ((uint32_t)0x00000002)  /*!< GPIO port B clock enable. */
+
+If we need to disable the clock, we clear, instead of set, bit 1 to 0x0. In code, it is:
+
+RCC->AHBENR |= 0x0;                   /* Clear bit 1 to disable */
 
 The safest is to include everything but the downside is it bloats the code, unnecessarily.
 		
