@@ -3,6 +3,10 @@ Leverage Any STM32 Library, Standard Peripheral Library(SPL), and CMSIS when reg
 
 STM32 Standard Peripheral Library, CMSIS, and Any Library	June 27, 2020
 
+I appreciate comments. Shoot me an email at noel_s_cruz@yahoo.com!
+
+Hire Me!
+
 Writing application code from scratch for microcontrollers is not an easy task. It is 
 painstakingly long and very drudgery as you go. But not to say anything cannot go wrong.
 On the other hand, anything can go astray.
@@ -285,6 +289,10 @@ As an aside, you write to use them in your application code. Try to follow and
 leverage the example/sample codes.
 
 Learn to love the registers. The keys to proficiency are read, understand and write code.
+
+I appreciate comments. Shoot me an email at noel_s_cruz@yahoo.com!
+
+Hire Me!
 
 Happy coding!
 
